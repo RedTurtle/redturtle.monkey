@@ -6,7 +6,7 @@
 
   <browser:page
     name="campaign_wizard"
-    for="..interfaces.ICampaign"
+    for="redturtle.monkey.content.campaign.ICampaign"
     class=".campaign.CampaignWizard"
     template="campaign_wizard.pt"
     permission="redturtle.monkey.create_campaign"
@@ -21,7 +21,7 @@
 
   <browser:page
     name="campaign_created"
-    for="..interfaces.ICampaign"
+    for="redturtle.monkey.content.campaign.ICampaign"
     permission="redturtle.monkey.create_campaign"
     template="campaign_created.pt"
     />
@@ -34,12 +34,20 @@
     />
 
   <browser:page
-    for="..interfaces.ICampaign"
+    for="redturtle.monkey.content.campaign.ICampaign"
     name="last_campaign"
     class=".last_campaign.LastCampaign"
     layer="..interfaces.IRedturtleMonkey"
     permission="zope2.View"
-     />
+    />
+
+  <browser:page
+    for="redturtle.monkey.content.campaign.ICampaign"
+    name="view"
+    template="campaign_view.pt"
+    layer="..interfaces.IRedturtleMonkey"
+    permission="zope2.View"
+    />
 
   <!-- Control panel -->
   <include package="plone.app.registry" />

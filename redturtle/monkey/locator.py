@@ -2,7 +2,7 @@
 # XXX from postmonkey import MailChimpException
 # XXX from postmonkey.exceptions import PostRequestError
 from plone.registry.interfaces import IRegistry
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import getUtility
 
 from redturtle.monkey.interfaces import IMonkeyLocator
@@ -25,10 +25,10 @@ def connect(func):
     return wrap_connect
 
 
+@implementer(IMonkeyLocator)
 class MonkeyLocator(object):
     """Utility for MailChimp API calls.
     """
-    implements(IMonkeyLocator)
 
     @connect
     def ping(self, campaign=None):
@@ -135,8 +135,8 @@ class MonkeyLocator(object):
         #md5_email = helpers.get_subscriber_hash(email)
         #info_url = '/3.0/lists/%s/members/%s' % (list_id, md5_email)
         #result = self.mailchimp.lists._mc_client._get(url=info_url)
-        
-        data = {"members": 
+
+        data = {"members":
                 [{"email_address": email, "status": "pending"}],
                 "update_existing": True
                }

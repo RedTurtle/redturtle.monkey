@@ -5,7 +5,7 @@
 from z3c.form import button
 from z3c.form import form
 from zope.component import getMultiAdapter
-from zope.interface import implements
+from zope.interface import implementer
 
 from Acquisition import aq_parent, aq_inner
 
@@ -15,8 +15,8 @@ from plone.app.portlets.browser.interfaces import IPortletEditForm
 from plone.app.portlets.interfaces import IPortletPermissionChecker
 
 
+@implementer(IPortletAddForm)
 class AddForm(form.AddForm):
-    implements(IPortletAddForm)
 
     label = _(u"Configure portlet")
 
@@ -56,11 +56,10 @@ class AddForm(form.AddForm):
         return ''
 
 
+@implementer(IPortletEditForm)
 class EditForm(form.EditForm):
     """An edit form for portlets.
     """
-
-    implements(IPortletEditForm)
 
     label = _(u"Modify portlet")
 

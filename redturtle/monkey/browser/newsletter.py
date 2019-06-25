@@ -4,7 +4,7 @@ from Products.statusmessages.interfaces import IStatusMessage
 # XXX from postmonkey import MailChimpException
 
 from zope.interface import Invalid
-from zope.interface import implements
+from zope.interface import implementer
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.component import getUtility
 
@@ -22,8 +22,8 @@ from redturtle.monkey.interfaces import IMonkeyLocator
 from redturtle.monkey.interfaces import INewsletterSubscribe
 
 
+@implementer(INewsletterSubscribe, IAttributeAnnotatable)
 class NewsletterSubcriber(object):
-    implements(INewsletterSubscribe, IAttributeAnnotatable)
     title = u""
 
 
@@ -79,7 +79,8 @@ class NewsletterSubscriberForm(extensible.ExtensibleForm, form.Form):
                     email_type=email_type,
                 )
             # except MailChimpException, error:
-            except Exception, error:
+            # XXX
+            except Exception as error:
                 if error.code == 214:
                     error_msg = _(
                         u"mailchimp_error_msg_already_subscribed",

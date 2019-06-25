@@ -35,13 +35,13 @@ class MonkeySettingsControlPanel(controlpanel.ControlPanelFormWrapper):
         try:
             return mailchimp.account()
         # XXX except PostRequestError:
-        except Exception, e:
+        except Exception as e:
             return []
         # XXX except MailChimpException, error:
-        except Exception, error:
+        except Exception as error:
             raise WidgetActionExecutionError(
                 Invalid(
                     u"Could not fetch account details from MailChimp. " +
-                    u"Please check your MailChimp API key: %s" % error
+                    u"Please check your MailChimp API key: %s" % str(error)
                 )
             )

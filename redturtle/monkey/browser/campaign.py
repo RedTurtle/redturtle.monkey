@@ -5,7 +5,7 @@ from zope.component import getUtility
 from zope.component import subscribers
 from zope.annotation.interfaces import IAnnotations
 from zope.schema.interfaces import IVocabularyFactory
-from Products.ATContentTypes.interfaces import IATTopic
+# from Products.ATContentTypes.interfaces import IATTopic
 from Products.CMFCore.utils import getToolByName
 try:
     from plone.app.collection.interfaces import ICollection
@@ -22,6 +22,9 @@ from DateTime import DateTime
 from redturtle.monkey.content.campaign import LAST_CAMPAIGN
 from redturtle.monkey.interfaces import IMonkeyLocator, IMailchimpSlot
 from redturtle.monkey import  _
+from plone import api
+from plone.memoize.view import memoize
+import pkg_resources
 
 
 class AddItems(BrowserView):
@@ -63,14 +66,23 @@ class CampaignWizard(BrowserView):
             return super(CampaignWizard, self).__call__()
 
     def available(self):
+
         mailchimp = getUtility(IMonkeyLocator)
         try:
             mailchimp.ping(campaign=self.context)
         except:
             return False
-        if not self.context.getCampaign_items():
+        if not filter(bool, [x.to_object for x in self.context.campaign_items]):
             return False
         return True
+
+    def package_version(self):
+        return pkg_resources.get_distribution("redturtle.monkey").version
+
+    @memoize
+    def portal_url(self):
+        return api.portal.get().absolute_url()
+
 
     def list_templates(self):
         """List all available mailchimp templates."""
@@ -92,7 +104,7 @@ class CampaignWizard(BrowserView):
 
     def list_campaign_items(self):
         """List all campaign items group by folderish/nonfolderish types."""
-        items = self.context.getCampaign_items()
+        items = self.context.campaign_items
         result = {u'manual_items':[]}
         wft = getToolByName(self.context, 'portal_workflow')
         def walk(items, result, parent):
@@ -100,8 +112,8 @@ class CampaignWizard(BrowserView):
                 collection = []
                 if COLLECTION and IContentListingObject.providedBy(item):
                     item = item.getObject()
-                elif IATTopic.providedBy(item):
-                    collection = item.queryCatalog(b_size=100, full_objects=True)
+                #elif IATTopic.providedBy(item):
+                #    collection = item.queryCatalog(b_size=100, full_objects=True)
                 elif COLLECTION and ICollection.providedBy(item):
                     collection = item.getQuery()
 
@@ -122,6 +134,7 @@ class CampaignWizard(BrowserView):
                                            'title': item.title_or_id()})
             return result
 
+        items = filter(bool, [item.to_object for item in items])
         result = walk(items, result, u'manual_items')
         return result
 
@@ -149,9 +162,9 @@ class CampaignWizard(BrowserView):
         content = self.generateCampaignContent(objs=form.get('items'), **form)
         if not content:
             IStatusMessage(self.request).add(_(u'Couldn\'t generate campaign items.'))
-            raise Redirect,\
-                self.request.response.redirect('%s/campaign_wizard' % \
-                                                  self.context.absolute_url())
+            self.request.response.redirect('%s/campaign_wizard' % \
+                                           self.context.absolute_url())
+            return
         try:
             campaign_id = mailchimp.createCampaign(subject=subject,
                                           list_id=list_id,
@@ -166,10 +179,10 @@ class CampaignWizard(BrowserView):
                                  (self.context.absolute_url(), campaign_id))
         # XXX
         # except MailChimpException, e:
-        except Exception, e:
-            IStatusMessage(self.request).add(e, type='error')
-            raise Redirect,\
-                self.request.response.redirect(self.context.absolute_url())
+        except Exception as e:
+            IStatusMessage(self.request).add(str(e), type='error')
+            self.request.response.redirect(self.context.absolute_url())
+            return
 
     def generateCampaignContent(self, objs=None, **kw):
         """Tries to render the html content for the campaign items,

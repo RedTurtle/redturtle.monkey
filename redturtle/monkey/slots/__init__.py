@@ -1,11 +1,11 @@
-from zope.interface import implements, Interface
+from zope.interface import implementer, Interface
 from zope.component import getMultiAdapter, adapts
 
 from redturtle.monkey.interfaces import IMailchimpSlot, IMailchimpSlotRenderer
 
 
+@implementer(IMailchimpSlot)
 class Slot(object):
-    implements(IMailchimpSlot)
     adapts(Interface)
     name = u''
 
@@ -23,8 +23,8 @@ class Slot(object):
         return '\n'.join(result)
 
 
+@implementer(IMailchimpSlotRenderer)
 class SlotRenderer(object):
-    implements(IMailchimpSlotRenderer)
     template = None
 
     def __init__(self, context, request):

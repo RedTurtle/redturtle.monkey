@@ -1,89 +1,60 @@
-"""Definition of the Campaign content type
-"""
-
-from zope.interface import implements
-
-from Products.Archetypes import atapi
-from Products.ATContentTypes.content.base import ATCTContent
-from Products.ATContentTypes.content.base import ATContentTypeSchema
-from Products.ATContentTypes.content import schemata
-from archetypes.referencebrowserwidget import ReferenceBrowserWidget
-
-from redturtle.monkey import  _
-from redturtle.monkey.config import PROJECTNAME
-from redturtle.monkey.interfaces import ICampaign
-
+# -*- coding: utf-8 -*-
 
 LAST_CAMPAIGN = 'redturtle.monkey.last_campaign'
 
+from plone.dexterity.content import Item
+from plone.supermodel import model
+from zope.interface import implementer
+from zope import schema
+from redturtle.monkey import _
+from z3c.relationfield.schema import RelationList
+from plone.app.z3cform.widget import RelatedItemsFieldWidget
+from plone.app.vocabularies.catalog import CatalogSource
+from z3c.relationfield.schema import RelationChoice
+from plone.autoform import directives as form
 
-CampaignSchema = ATContentTypeSchema.copy() + atapi.Schema((
 
-    atapi.StringField('campaign_api_key',
-        storage=atapi.AnnotationStorage(),
-        widget=atapi.StringWidget(
-            label=_(u"Campaign API key"),
-            description=_(u"Custom Mailchimp API key for this campaign"),
+class ICampaign(model.Schema):
+    """ Marker interface and Dexterity Python Schema for Campaign
+    """
+
+    campaign_api_key = schema.TextLine(
+        title=_(u"Campaign API key"),
+        description=_(u"Custom Mailchimp API key for this campaign"),
+        required=False
+    )
+
+    campaign_from_email = schema.TextLine(
+        title=_(u"Campaign FROM email"),
+        description=_(u"Custom Mailchimp FROM email for this campaign"),
+        required=False
+    )
+
+    campaign_from_name = schema.TextLine(
+        title=_(u"Campaign FROM name"),
+        description=_(u"Custom Mailchimp FROM name for this campaign"),
+        required=False
+    )
+
+    campaign_items = RelationList(
+        title=_(u'label_campaign_items', default=u'Campaign\'s items'),
+        default=[],
+        value_type=RelationChoice(
+            title=_(u'label_campaign_items', default=u'Campaign\'s items'),
+            source=CatalogSource(),
         ),
-    ),
-
-    atapi.StringField('campaign_from_email',
-        storage=atapi.AnnotationStorage(),
-        widget=atapi.StringWidget(
-            label=_(u"Campaign FROM email"),
-            description=_(u"Custom Mailchimp FROM email for this campaign"),
-        ),
-    ),
-
-    atapi.StringField('campaign_from_name',
-        storage=atapi.AnnotationStorage(),
-        widget=atapi.StringWidget(
-            label=_(u"Campaign FROM name"),
-            description=_(u"Custom Mailchimp FROM name for this campaign"),
-        ),
-    ),
-
-    atapi.ReferenceField('campaign_items',
-        relationship = 'campaignItems',
-        multiValued = True,
-        languageIndependent = False,
-        widget = ReferenceBrowserWidget(
-            allow_search = True,
-            allow_browse = True,
-            allow_sorting = True,
-            show_indexes = False,
-            force_close_on_insert = True,
-            label = _(u'label_campaign_items', default=u'Campaign\'s items'),
-            description = '',
-            visible = {'edit' : 'visible', 'view' : 'invisible' },
-            )
-        ),
-
-    ))
-
-# Set storage on fields copied from ATFolderSchema, making sure
-# they work well with the python bridge properties.
-
-CampaignSchema['title'].storage = atapi.AnnotationStorage()
-CampaignSchema['description'].storage = atapi.AnnotationStorage()
-
-schemata.finalizeATCTSchema(
-    CampaignSchema,
-    folderish=False,
-    moveDiscussion=False
-)
+        required=True
+    )
+    form.widget('campaign_items',
+                RelatedItemsFieldWidget,
+                source=CatalogSource()
+    )
 
 
-class Campaign(ATCTContent):
-    """Monkey campaign"""
-    implements(ICampaign)
-
-    meta_type = "Campaign"
-    schema = CampaignSchema
-
-    title = atapi.ATFieldProperty('title')
-    description = atapi.ATFieldProperty('description')
-
+@implementer(ICampaign)
+class Campaign(Item):
+    """
+    """
     @property
     def api_key(self):
         return self.getCampaign_api_key()
@@ -96,4 +67,4 @@ class Campaign(ATCTContent):
     def from_email(self):
         return self.getCampaign_from_email()
 
-atapi.registerType(Campaign, PROJECTNAME)
+

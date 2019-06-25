@@ -5,8 +5,8 @@ from plone.app.portlets.portlets import base
 from plone.app.uuid.utils import uuidToObject
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CMFCore.utils import getToolByName
-from Products.Archetypes.config import REFERENCE_CATALOG
-from zope.interface import implements
+# from Products.Archetypes.config import REFERENCE_CATALOG
+from zope.interface import implementer
 
 from redturtle.monkey import  _
 
@@ -26,20 +26,21 @@ class Renderer(base.Renderer):
         return _(u"Add item to campaign")
 
     def list_campaign(self):
+        # XXX
         result = {'related': [],
                   'not_related': []}
 
-        reference_catalog = getToolByName(self.context, REFERENCE_CATALOG)
-        references = reference_catalog.getBackReferences(self.context,
-                                          relationship="campaignItems")
-        related = [a.sourceUID for a in references]
+        # reference_catalog = getToolByName(self.context, REFERENCE_CATALOG)
+        # references = reference_catalog.getBackReferences(self.context,
+        #                                   relationship="campaignItems")
+        # related = [a.sourceUID for a in references]
 
-        portal_catalog = getToolByName(self.context, 'portal_catalog')
-        brains = portal_catalog(portal_type='Campaign')
-        not_related = [a.UID for a in brains if a.UID not in related]
+        # portal_catalog = getToolByName(self.context, 'portal_catalog')
+        # brains = portal_catalog(portal_type='Campaign')
+        # not_related = [a.UID for a in brains if a.UID not in related]
 
-        result['related'] = [uuidToObject(u) for u in related]
-        result['not_related'] = [uuidToObject(u) for u in not_related]
+        # result['related'] = [uuidToObject(u) for u in related]
+        # result['not_related'] = [uuidToObject(u) for u in not_related]
         return result
 
     @property
@@ -52,11 +53,11 @@ class Renderer(base.Renderer):
             return True
 
 
+@implementer(IAddToCampaign)
 class Assignment(base.Assignment):
     """
     Assignement for Add to campaign
     """
-    implements(IAddToCampaign)
 
     @property
     def title(self):
