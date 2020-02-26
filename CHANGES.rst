@@ -1,8 +1,13 @@
 Changelog
 =========
 
+1.3.3v3API (unreleased)
+-----------------------
+ - Introduce folder_id field in campaing.py to handle local settings
+   [lucabel]
+
 1.3.2v3API (unreleased)
-------------------
+-----------------------
 - fixed some API calls to get template folder id and fixed portlet to subscribe new users.
   [daniele]
 - [BreakingChange]: change the wrapper we use to communicate with mailchimp
