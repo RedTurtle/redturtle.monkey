@@ -64,6 +64,7 @@ class MonkeyLocator(object):
             # XXX OCCHIO CHE QUESTA E' PER FTA: SERVE FARE UN QUALCOSA NEL REGISTRY PER
             # SALVARSELO. ANCHE SENZA INTERFACCIA FIGA. SOLO UNA ENTRY NEL REGISTRY.
             #folder_id='75977c3d27'
+            # self.mailchimp.template_folders.all() per vedere i folder
             folder_id = self.settings.folder_id
             return self.mailchimp.templates.all(folder_id=folder_id)['templates']
         # # XXX except MailChimpException:
@@ -135,8 +136,8 @@ class MonkeyLocator(object):
         #md5_email = helpers.get_subscriber_hash(email)
         #info_url = '/3.0/lists/%s/members/%s' % (list_id, md5_email)
         #result = self.mailchimp.lists._mc_client._get(url=info_url)
-        
-        data = {"members": 
+
+        data = {"members":
                 [{"email_address": email, "status": "pending"}],
                 "update_existing": True
                }

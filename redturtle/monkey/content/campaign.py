@@ -43,6 +43,14 @@ CampaignSchema = ATContentTypeSchema.copy() + atapi.Schema((
         ),
     ),
 
+    atapi.StringField('campaign_templates_folder',
+        storage=atapi.AnnotationStorage(),
+        widget=atapi.StringWidget(
+            label=_(u"Campaign Template Folder"),
+            description=_(u"Custom Mailchimp Template folder"),
+        ),
+    ),
+
     atapi.ReferenceField('campaign_items',
         relationship = 'campaignItems',
         multiValued = True,
@@ -95,5 +103,9 @@ class Campaign(ATCTContent):
     @property
     def from_email(self):
         return self.getCampaign_from_email()
+
+    @property
+    def folder_id(self):
+        return self.getCampaign_templates_folder()
 
 atapi.registerType(Campaign, PROJECTNAME)

@@ -492,3 +492,8 @@ msgstr "contenuti"
 msgid "subscribe_to_newsletter_button"
 msgstr "Iscriviti"
 
+msgid "Campaign Template Folder"
+msgstr "ID della cartella dei template"
+
+msgid "Custom Mailchimp Template folder"
+msgstr "Indicare l'id della cartella in cui si sono messi i template per la newsletter. È possibile ottenere l'id solo analizzando le richieste all'api"
